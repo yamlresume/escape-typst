@@ -22,4 +22,4 @@
  * IN THE SOFTWARE.
  */
 
-export { escapeTypst } from './escape'
+export { escapeTypst, unescapeTypst } from './escape'

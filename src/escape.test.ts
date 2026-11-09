@@ -23,7 +23,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { escapeTypst } from './escape'
+import { escapeTypst, unescapeTypst } from './escape'
 
 describe(escapeTypst, () => {
   it('returns empty and plain text unchanged', () => {
@@ -92,5 +92,64 @@ describe(escapeTypst, () => {
     expect(escapeTypst(input)).toBe(
       '\\= Heading\n\\- item\n\\+ item\n\\/ Term\\: description\n1\\. item'
     )
+  })
+})
+
+describe(unescapeTypst, () => {
+  it('returns empty and plain text unchanged', () => {
+    expect(unescapeTypst('')).toBe('')
+    expect(unescapeTypst('Hello, Typst!')).toBe('Hello, Typst!')
+  })
+
+  it('preserves Unicode and whitespace', () => {
+    const input = '你好 👩\u200d💻\tline one\n\nline two'
+
+    expect(unescapeTypst(input)).toBe(input)
+  })
+
+  it.each([
+    ['\\\\', '\\'],
+    ['\\/', '/'],
+    ['\\[', '['],
+    ['\\]', ']'],
+    ['\\~', '~'],
+    ['\\-', '-'],
+    ['\\.', '.'],
+    ["\\'", "'"],
+    ['\\"', '"'],
+    ['\\*', '*'],
+    ['\\_', '_'],
+    ['\\:', ':'],
+    ['\\`', '`'],
+    ['\\$', '$'],
+    ['\\<', '<'],
+    ['\\>', '>'],
+    ['\\@', '@'],
+    ['\\#', '#'],
+    ['\\=', '='],
+    ['\\+', '+'],
+  ])('unescapes %s', (input, expected) => {
+    expect(unescapeTypst(input)).toBe(expected)
+  })
+
+  it.each([
+    '\\@',
+    '\\\\@',
+    '\\_',
+    '\\#x',
+    'x\\@y',
+    '"quoted" \\\'single\\\'',
+    'https://example.com/a_b?x=1#section',
+    'back\\\\slash\\@ppresume.com',
+  ])('round-trips %s', (input) => {
+    expect(unescapeTypst(escapeTypst(input))).toBe(input)
+  })
+
+  it('reverts escaped markup examples', () => {
+    expect(
+      unescapeTypst(
+        '\\#rect \\$x\\$ \\<label\\> \\@label \\`raw\\` \\_emphasis\\_'
+      )
+    ).toBe('#rect $x$ <label> @label `raw` _emphasis_')
   })
 })

@@ -23,6 +23,8 @@
  */
 
 const MARKUP_SPECIAL_CHARACTER_PATTERN = /[\\/[\]~\-.'"_:`$<>@#=+*]/g
+const ESCAPED_MARKUP_SPECIAL_CHARACTER_PATTERN =
+  /\\([\\/[\]~\-.'"_:`$<>@#=+*])/g
 
 /**
  * Escape characters that have special meaning in Typst markup mode.
@@ -32,4 +34,17 @@ const MARKUP_SPECIAL_CHARACTER_PATTERN = /[\\/[\]~\-.'"_:`$<>@#=+*]/g
  */
 export function escapeTypst(input: string): string {
   return input.replace(MARKUP_SPECIAL_CHARACTER_PATTERN, '\\$&')
+}
+
+/**
+ * Revert {@link escapeTypst}.
+ *
+ * This is the exact inverse for values produced by `escapeTypst`; it is not a
+ * general-purpose parser for arbitrary Typst markup.
+ *
+ * @param input - Text previously escaped by `escapeTypst`.
+ * @returns The original plain text.
+ */
+export function unescapeTypst(input: string): string {
+  return input.replace(ESCAPED_MARKUP_SPECIAL_CHARACTER_PATTERN, '$1')
 }

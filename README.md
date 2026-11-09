@@ -20,10 +20,13 @@ yarn add escape-typst
 ## Quick start
 
 ```ts
-import { escapeTypst } from 'escape-typst'
+import { escapeTypst, unescapeTypst } from 'escape-typst'
 
 escapeTypst('Use #rect with $x$ and *carefully*.')
 // Use \#rect with \$x\$ and \*carefully\*.
+
+unescapeTypst('Use \\#rect with \\$x\\$ and \\*carefully\\*.')
+// Use #rect with $x$ and *carefully*.
 ```
 
 The returned string can be interpolated into a Typst document in markup mode:
@@ -36,6 +39,7 @@ const source = `#let name = [${escapeTypst(userProvidedName)}]`
 
 ```ts
 export function escapeTypst(input: string): string
+export function unescapeTypst(input: string): string
 ```
 
 `escapeTypst` prefixes Typst markup-significant characters with a backslash.
@@ -50,6 +54,14 @@ characters used for headings, lists, and numbering.
 Ordinary text, Unicode, and whitespace are preserved. Applying the function
 more than once is not idempotent because backslashes added by an earlier call
 are escaped again.
+
+`unescapeTypst` is the exact inverse for strings produced by `escapeTypst`:
+
+```ts
+unescapeTypst(escapeTypst(input)) === input
+```
+
+It is not a general-purpose parser for arbitrary Typst markup.
 
 ### Scope
 
