@@ -1,6 +1,6 @@
 {
   "name": "escape-typst",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Escape Typst markup special characters with JavaScript.",
   "license": "MIT",
   "author": {
